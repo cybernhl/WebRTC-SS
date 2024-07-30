@@ -1,18 +1,25 @@
 buildscript {
-	ext {
-		springBootVersion = '2.0.5.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-		maven {
-			url "https://plugins.gradle.org/m2/"
-		}
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath "gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.20.1"
-		classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1"
-	}
+    ext {
+        springBootVersion = '2.0.5.RELEASE'
+    }
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        mavenCentral()
+        google()
+        maven {
+            url = uri('https://maven.pkg.jetbrains.space/public/p/compose/dev')
+        }
+        maven{
+            url "https://raw.githubusercontent.com/cybernhl/maven-repository/master/"
+        }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.20.1"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1"
+    }
 }
 
 apply plugin: 'java'
@@ -32,15 +39,25 @@ bootJar {
 }
 
 repositories {
-	mavenCentral()
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
+    mavenCentral()
+    google()
+    maven {
+        url = uri('https://maven.pkg.jetbrains.space/public/p/compose/dev')
+    }
+    maven{
+        url "https://raw.githubusercontent.com/cybernhl/maven-repository/master/"
+    }
 }
 
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-websocket')
-    compile('org.springframework.boot:spring-boot-starter-validation')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-websocket')
+    implementation('org.springframework.boot:spring-boot-starter-validation')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 
 task unpack(type: Copy) {
