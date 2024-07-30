@@ -1,0 +1,51 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+//apply plugin: 'com.palantir.docker'//stop can not support gradle 8.8
+apply plugin: 'com.bmuschko.docker-remote-api'
+apply plugin: "org.sonarqube"
+
+group = 'io.github.benkoff'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+bootJar {
+    archiveFileName = "webrtcss-spring-boot-docker-${archiveVersion}.jar"
+    archiveVersion = '0.1.0'
+}
+
+dependencies {
+    implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-websocket')
+    implementation('org.springframework.boot:spring-boot-starter-validation')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+task unpack(type: Copy) {
+    dependsOn bootJar
+    from(zipTree(file("build/libs/${bootJar.archiveFileName.get()}")))
+    into("build/dependency")
+}
+
+task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage) {
+    dependsOn unpack
+    def bootJarArchive = tasks.named('bootJar', BootJar).get().archiveFileName.get()
+    inputDir = file('.')
+    def imageName = "benkoff/" + bootJarArchive.split("-")[-2] + ":latest"
+    images = [imageName]
+    dockerFile = file('Dockerfile')
+    buildArgs = [
+            DEPENDENCY: 'dependency'
+    ]
+
+    doFirst {
+        copySpec.from(tasks.unpack.outputs).into('dependency')
+    }
+}
